@@ -1,0 +1,925 @@
+<title>採用アセスメント</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* Layout: persistent slim top bar + hash-routed full-width views; cards stack to one column at phone width */
+:root{
+  color-scheme: light;
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface-raised:#ffffff;
+  --text:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+  --border:rgba(11,11,11,0.10); --grid:#e1e0d9;
+  --series-1:#2a78d6; --series-1-ink:#184f95;
+  --series-2:#eb6834; --series-2-ink:#9e4017;
+  --good:#0ca30c; --warning:#c98000; --critical:#d03b3b;
+  --accent:#2a78d6; --accent-contrast:#ffffff;
+  --radius:12px;
+  --font: "Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0d0d0d; --surface:#1a1a19; --surface-raised:#232322;
+    --text:#f0efec; --text-secondary:#c3c2b7; --text-muted:#9b9a93;
+    --border:rgba(255,255,255,0.12); --grid:#2c2c2a;
+    --series-1:#3987e5; --series-1-ink:#bcd6f7;
+    --series-2:#d95926; --series-2-ink:#f6c3a6;
+    --good:#2bc92b; --warning:#fab219; --critical:#e66767;
+    --accent:#3987e5;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-raised:#232322;
+  --text:#f0efec; --text-secondary:#c3c2b7; --text-muted:#9b9a93;
+  --border:rgba(255,255,255,0.12); --grid:#2c2c2a;
+  --series-1:#3987e5; --series-1-ink:#bcd6f7;
+  --series-2:#d95926; --series-2-ink:#f6c3a6;
+  --good:#2bc92b; --warning:#fab219; --critical:#e66767;
+  --accent:#3987e5;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font);
+  min-height:100%;
+}
+#app{
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:24px 64px;
+  max-width:880px; margin:0 auto;
+}
+h1,h2,h3{text-wrap:balance; margin:0; font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:14px max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  border-bottom:1px solid var(--border); background:var(--surface);
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:10;
+}
+.brand{font-weight:900; font-size:15px; letter-spacing:.01em}
+.brand a{color:var(--text); text-decoration:none}
+.topnav{display:flex; gap:4px; flex-wrap:wrap}
+.tab{
+  padding:7px 12px; border-radius:999px; font-size:13px; font-weight:500;
+  color:var(--text-secondary); text-decoration:none; border:1px solid transparent;
+}
+.tab.is-active{background:var(--accent); color:var(--accent-contrast); font-weight:700}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px; margin-top:16px;
+}
+.stack{display:flex; flex-direction:column; gap:16px}
+.row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.muted{color:var(--text-muted)}
+.secondary-text{color:var(--text-secondary)}
+.eyebrow{font-size:12px; font-weight:700; letter-spacing:.06em; color:var(--text-muted); text-transform:uppercase}
+.btn{
+  appearance:none; border:1px solid var(--border); background:var(--surface-raised); color:var(--text);
+  padding:10px 16px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font);
+}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.btn-primary{background:var(--accent); color:var(--accent-contrast); border-color:transparent}
+.btn-primary:disabled{opacity:.45; cursor:not-allowed}
+.btn-sm{padding:6px 10px; font-size:12.5px}
+input[type=text],input[type=email],select{
+  width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border);
+  background:var(--surface-raised); color:var(--text); font-family:var(--font); font-size:14px;
+}
+label.field{display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:700; color:var(--text-secondary); flex:1; min-width:180px}
+table{width:100%; border-collapse:collapse; font-size:13.5px}
+th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--border); min-width:0}
+th{color:var(--text-muted); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.04em}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+.pill{display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; font-size:12px; font-weight:700}
+.pill-done{background:rgba(12,163,12,0.14); color:var(--good)}
+.pill-wait{background:rgba(137,135,129,0.18); color:var(--text-secondary)}
+.notice{border-radius:10px; padding:12px 14px; font-size:13.5px; border:1px solid var(--border); background:var(--surface-raised)}
+.notice-warn{border-color:var(--warning); color:var(--text)}
+.notice-critical{border-color:var(--critical); color:var(--text)}
+.caution{font-size:12.5px; color:var(--text-secondary); line-height:1.6; border-top:1px dashed var(--border); padding-top:12px; margin-top:4px}
+.progressbar{height:6px; border-radius:999px; background:var(--grid); overflow:hidden}
+.progressbar > span{display:block; height:100%; background:var(--accent)}
+.likert-item{padding:14px 0; border-bottom:1px solid var(--border)}
+.likert-item:last-child{border-bottom:none}
+.likert-text{font-size:14.5px; font-weight:500; margin-bottom:10px; line-height:1.55}
+.likert-scale{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.likert-end{font-size:11.5px; color:var(--text-muted); min-width:0}
+.likert-opts{display:flex; gap:10px; flex:1; justify-content:center; min-width:140px}
+.likert-opt{position:relative; display:flex; align-items:center; justify-content:center}
+.likert-opt input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer}
+.likert-opt span{
+  width:34px; height:34px; border-radius:999px; border:1.5px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--text-secondary); font-weight:700;
+}
+.likert-opt input:checked + span{background:var(--accent); color:var(--accent-contrast); border-color:var(--accent)}
+.mc-item{padding:16px 0; border-bottom:1px solid var(--border)}
+.mc-item:last-child{border-bottom:none}
+.mc-q{font-size:14.5px; font-weight:500; line-height:1.6; margin-bottom:10px}
+.mc-index{display:inline-block; font-size:11.5px; font-weight:700; color:var(--accent); margin-right:6px}
+.mc-opts{display:flex; flex-direction:column; gap:7px}
+.mc-opt{
+  display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px;
+  border:1px solid var(--border); cursor:pointer; font-size:13.5px;
+}
+.mc-opt input{position:absolute; opacity:0; width:0; height:0}
+.mc-opt.is-selected{border-color:var(--accent); background:rgba(42,120,214,0.08)}
+.mc-letter{
+  width:22px; height:22px; border-radius:6px; background:var(--grid); color:var(--text-secondary);
+  font-size:11.5px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none;
+}
+.mc-opt.is-selected .mc-letter{background:var(--accent); color:var(--accent-contrast)}
+.timer{
+  font-variant-numeric:tabular-nums; font-weight:700; font-size:14px; padding:5px 11px;
+  border-radius:999px; background:var(--grid); color:var(--text-secondary);
+}
+.timer.is-low{background:rgba(208,59,59,0.16); color:var(--critical)}
+.section-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:4px}
+.bar-row{display:flex; align-items:center; gap:12px; padding:7px 0}
+.bar-label{width:120px; flex:none; font-size:13px; font-weight:700; color:var(--text-secondary)}
+.bar-track{flex:1; height:10px; border-radius:999px; background:var(--grid); overflow:hidden; min-width:0}
+.bar-fill{height:100%; border-radius:999px}
+.bar-value{width:68px; flex:none; text-align:right; font-size:13px; font-variant-numeric:tabular-nums; color:var(--text-secondary)}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--text-secondary); margin-top:6px}
+.legend-dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle}
+.stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
+.stat-tile{border:1px solid var(--border); border-radius:10px; padding:14px; background:var(--surface-raised)}
+.stat-tile .num{font-size:28px; font-weight:900; font-variant-numeric:tabular-nums}
+.stat-tile .cap{font-size:12px; color:var(--text-muted); margin-top:2px}
+.link-box{display:flex; gap:8px; align-items:center}
+.link-box input{font-size:12.5px; font-family:ui-monospace,monospace}
+.slider-row{display:flex; align-items:center; gap:12px; padding:8px 0}
+.slider-row label{flex:0 0 150px; font-size:13px; color:var(--text-secondary); font-weight:700}
+.slider-row input[type=range]{flex:1; accent-color:var(--accent)}
+.slider-row .sv{width:30px; text-align:right; font-variant-numeric:tabular-nums; font-size:13px; font-weight:700}
+.culture-cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px}
+.flag{font-size:11.5px; font-weight:700; color:var(--critical); background:rgba(208,59,59,0.12); padding:2px 8px; border-radius:999px}
+@media (max-width:560px){
+  .bar-label{width:88px; font-size:12px}
+  .stat-tile .num{font-size:24px}
+}
+</style>
+
+<div id="app"></div>
+
+<script>
+(function(){
+"use strict";
+
+var BIG_FIVE_ITEMS = [
+  {trait:"E", reverse:false, text:"初対面の人とでも気軽に話せる"},
+  {trait:"A", reverse:false, text:"同僚の意見にまず耳を傾けるようにしている"},
+  {trait:"C", reverse:false, text:"期限が決まっている仕事は早めに取りかかる"},
+  {trait:"N", reverse:false, text:"予想外のトラブルが起きても冷静に対応できる"},
+  {trait:"O", reverse:false, text:"新しいやり方や考え方を積極的に試したい"},
+  {trait:"E", reverse:false, text:"人前で話すことに抵抗がない"},
+  {trait:"A", reverse:false, text:"困っている人を見ると自然と手を差し伸べる"},
+  {trait:"C", reverse:false, text:"細部まで確認しないと気が済まない"},
+  {trait:"N", reverse:false, text:"強いストレスを感じてもすぐに立て直せる"},
+  {trait:"O", reverse:false, text:"普段と違う分野の知識にも興味がある"},
+  {trait:"E", reverse:true,  text:"大勢の集まりでは、なるべく目立たないようにしている"},
+  {trait:"A", reverse:true,  text:"自分の意見を通すためには多少の対立も気にしない"},
+  {trait:"C", reverse:true,  text:"やるべきことを後回しにしてしまうことがよくある"},
+  {trait:"N", reverse:true,  text:"些細なことでも気になって落ち着かなくなる"},
+  {trait:"O", reverse:true,  text:"慣れた方法を変えることに抵抗がある"},
+  {trait:"E", reverse:true,  text:"一人で過ごす時間の方が居心地が良いと感じる"},
+  {trait:"A", reverse:true,  text:"他人の問題に深く関わりたくないと感じることが多い"},
+  {trait:"C", reverse:true,  text:"計画を立てずに物事を進めることが多い"},
+  {trait:"N", reverse:true,  text:"不安な気持ちになりやすい"},
+  {trait:"O", reverse:true,  text:"未知の状況よりも、確実で予測可能な状況を好む"}
+];
+var TRAIT_LABELS = {E:"外向性", A:"協調性", C:"誠実性", N:"情緒安定性", O:"開放性"};
+var TRAIT_ORDER = ["E","A","C","N","O"];
+
+var APTITUDE_SETS = {
+  new_grad: {
+    logical:[
+      {q:"「すべての鳥は飛べる」という命題が正しいとき、次のうち論理的に正しいのはどれか。",
+        options:["ペンギンは鳥ではない","飛べない動物は鳥ではない","鳥でなければ飛べない","飛べる動物はすべて鳥である"], answerIndex:1},
+      {q:"すべてのエンジニアはPCを使う。田中さんはPCを使う。このことから確実に言えるのはどれか。",
+        options:["田中さんはエンジニアである","PCを使わない人は全員エンジニアではない","エンジニアでない人は全員PCを使わない","PCを使う人は全員エンジニアである"], answerIndex:1},
+      {q:"会議の資料がすべて準備できていれば、会議を開始できる。本日の会議は開始できなかった。このことから確実に言えるのはどれか。",
+        options:["資料がすべて準備できていなかった","資料は準備できていたが、他の理由で開始できなかった","会議は来週に延期される","資料を準備した人は会議に出席できない"], answerIndex:0},
+      {q:"この部署では、入社3年以上の社員だけがリーダーになれる。山田さんはリーダーである。このことから確実に言えるのはどれか。",
+        options:["山田さんは入社3年以上である","入社3年以上の社員は全員リーダーである","山田さんは入社3年未満である","リーダーでない社員は入社3年未満である"], answerIndex:0}
+    ],
+    numerical:[
+      {q:"定価2,000円の商品を20%引きで販売した場合の販売価格はいくらか。", options:["1,400円","1,600円","1,800円","2,400円"], answerIndex:1},
+      {q:"ある作業をAさん1人で行うと12日、Bさん1人で行うと6日かかる。2人で一緒に行うと何日かかるか。", options:["3日","4日","5日","6日"], answerIndex:1},
+      {q:"定価の合計が120,000円の商品を、全体で15%引きで購入した。支払った金額はいくらか。", options:["96,000円","100,000円","102,000円","108,000円"], answerIndex:2},
+      {q:"数列 3, 7, 11, 15, ? に当てはまる数字はどれか。", options:["17","18","19","21"], answerIndex:2}
+    ],
+    verbal:[
+      {q:"「医者」と「病院」の関係と最も近いものはどれか。", options:["教師:学校","本:図書館","料理人:料理","学生:教科書"], answerIndex:0},
+      {q:"「杞憂」の意味として最も近いものはどれか。", options:["深い感謝","無用な心配","大きな喜び","激しい怒り"], answerIndex:1},
+      {q:"「柔軟」の対義語として最も適切なものはどれか。", options:["頑固","優柔","温和","慎重"], answerIndex:0},
+      {q:"「新入社員の佐藤さんは、分からないことがあるとすぐに先輩に質問し、指摘された点はその日のうちにメモして次に活かすようにしている。」この文章から読み取れる佐藤さんの特徴として最も適切なものはどれか。",
+        options:["一人で黙々と作業するのが得意である","周囲に積極的に働きかけ、学んだことを次に活かそうとしている","指摘されることを極端に嫌う","新しい環境への適応に時間がかかる"], answerIndex:1}
+    ]
+  },
+  mid_career: {
+    logical:[
+      {q:"予算が承認された場合のみ、プロジェクトは開始できる。プロジェクトAは開始されなかった。このことから確実に言えるのはどれか。",
+        options:["予算は承認されなかった","予算は承認されたが、別の理由で開始しなかった","来期は予算が承認される","プロジェクトBも開始されない"], answerIndex:0},
+      {q:"すべての管理職は予算管理の権限を持つ。鈴木さんは予算管理の権限を持たない。このことから確実に言えるのはどれか。",
+        options:["鈴木さんは管理職ではない","鈴木さんは今後管理職になる","予算管理の権限を持つ人は全員管理職である","鈴木さんは新入社員である"], answerIndex:0},
+      {q:"A社、B社、C社のうち1社だけが契約を更新した。A社が更新した場合はB社は更新していない。B社が更新した場合はC社も更新している。C社は更新していない。更新したのはどの会社か。",
+        options:["A社","B社","C社","特定できない"], answerIndex:0},
+      {q:"この等級に昇進できるのは、評価がS評価の社員だけである。田中さんは等級が昇進した。このことから確実に言えるのはどれか。",
+        options:["田中さんの評価はS評価である","S評価の社員は全員昇進する","田中さんは来年も昇進する","田中さんの評価はS評価ではない"], answerIndex:0}
+    ],
+    numerical:[
+      {q:"ある商品の売上が前年比20%増加し、今年の売上は1,200万円であった。前年の売上はいくらか。", options:["960万円","1,000万円","1,040万円","1,440万円"], answerIndex:1},
+      {q:"プロジェクトの予算300万円のうち、人件費が60%、その他経費が残りを占める。その他経費はいくらか。", options:["100万円","110万円","120万円","180万円"], answerIndex:2},
+      {q:"社員30人のチームで、1人あたり月10件の処理件数だったが、ツール導入後は1人あたり月13件に増加した。チーム全体の月間処理件数の増加数はいくらか。", options:["60件","90件","120件","150件"], answerIndex:1},
+      {q:"A支店の売上はB支店の1.5倍である。2支店合計の売上が2,500万円のとき、B支店の売上はいくらか。", options:["900万円","1,000万円","1,100万円","1,250万円"], answerIndex:1}
+    ],
+    verbal:[
+      {q:"「鶏口牛後」の意味として最も近いものはどれか。", options:["大きな組織の末端より、小さな組織の長である方がよい","牛のように黙々と働くべきである","鳥のように身軽に行動するべきである","上司の指示には絶対に従うべきである"], answerIndex:0},
+      {q:"取引先に送るメールの文面として、最も適切な表現はどれか。", options:["「了解です、大丈夫です」","「承知いたしました。ご対応いたします」","「わかりました、やっておきます」","「OKです、任せてください」"], answerIndex:1},
+      {q:"「迅速」の対義語として最も適切なものはどれか。", options:["緩慢","慎重","丁寧","正確"], answerIndex:0},
+      {q:"「中途入社の木村さんは、前職での経験を活かしつつも、まずは今の職場のやり方やルールを丁寧に確認し、必要に応じて周囲に意見を求めながら業務を進めている。」この文章から読み取れる木村さんの特徴として最も適切なものはどれか。",
+        options:["前職の方法を変えずに押し通そうとしている","新しい環境に合わせながら、自分の経験も活かそうとしている","周囲の意見を聞かずに独断で進めている","ルールを確認せずに自己流で進めている"], answerIndex:1}
+    ]
+  }
+};
+var APTITUDE_SECONDS = 720;
+
+var CULTURE_AXES = [
+  {key:"speed", label:"スピード・挑戦志向"},
+  {key:"team", label:"チーム協働志向"},
+  {key:"autonomy", label:"裁量・自律志向"},
+  {key:"change", label:"変化対応志向"},
+  {key:"process", label:"手順・ルール重視"},
+  {key:"growth", label:"成長・学び重視"}
+];
+var CULTURE_ITEMS = [
+  {axis:"speed", text:"新しいことに挑戦する機会が多い環境で働きたい"},
+  {axis:"team", text:"一人で黙々と進めるより、チームで相談しながら進める方が好きだ"},
+  {axis:"autonomy", text:"細かい指示よりも、裁量を持って自分で判断しながら進めたい"},
+  {axis:"change", text:"変化の多い環境の方が、安定した環境よりも刺激を感じる"},
+  {axis:"process", text:"手順やルールに沿って進めることを大切にしている"},
+  {axis:"growth", text:"目先の成果よりも、学びや成長を感じられることを重視している"},
+  {axis:"speed", text:"じっくり検討するより、まず動いて試す方が性に合っている"},
+  {axis:"team", text:"困ったときはまず周囲に相談するタイプだ"},
+  {axis:"autonomy", text:"進め方は自分で決めたいと思うことが多い"},
+  {axis:"change", text:"同じ業務を長く続けるより、新しい業務に変わる方が好きだ"},
+  {axis:"process", text:"決まったやり方がある方が安心して仕事ができる"},
+  {axis:"growth", text:"結果が出るまでの過程での成長を大切にしたい"}
+];
+var DEFAULT_TARGETS = {speed:3, team:3, autonomy:3, change:3, process:3, growth:3};
+var TRACK_LABELS = {new_grad:"新卒採用", mid_career:"中途採用"};
+
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function fmtDate(ms){
+  if(!ms) return "—";
+  var d = new Date(ms);
+  return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+}
+function fmtSec(s){
+  s = Math.max(0, Math.round(s));
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+function csvCell(v){ return '"'+String(v==null?"":v).replace(/"/g,'""')+'"'; }
+function pct(n){ return Math.round(n*100)/100; }
+
+function scoreBigFive(answers){
+  var sums={E:0,A:0,C:0,N:0,O:0}, counts={E:0,A:0,C:0,N:0,O:0};
+  BIG_FIVE_ITEMS.forEach(function(item,i){
+    var raw = answers[i];
+    if(raw==null) raw = 3;
+    var v = item.reverse ? (6-raw) : raw;
+    sums[item.trait]+=v; counts[item.trait]++;
+  });
+  var out={};
+  TRAIT_ORDER.forEach(function(t){ out[t]=pct(sums[t]/counts[t]); });
+  return out;
+}
+function scoreAptitude(answers, track){
+  var set = APTITUDE_SETS[track] || APTITUDE_SETS.new_grad;
+  var cats=["logical","numerical","verbal"], out={}, totalCorrect=0, totalCount=0;
+  cats.forEach(function(cat){
+    var items=set[cat], correct=0;
+    items.forEach(function(item,i){ if(answers[cat+"-"+i]===item.answerIndex) correct++; });
+    out[cat]={correct:correct, total:items.length};
+    totalCorrect+=correct; totalCount+=items.length;
+  });
+  out.overall={correct:totalCorrect, total:totalCount};
+  return out;
+}
+function scoreCulture(answers, targets){
+  var sums={}, counts={};
+  CULTURE_AXES.forEach(function(a){ sums[a.key]=0; counts[a.key]=0; });
+  CULTURE_ITEMS.forEach(function(item,i){
+    var v = answers[i]; if(v==null) v=3;
+    sums[item.axis]+=v; counts[item.axis]++;
+  });
+  var axisScores={}, diffSum=0;
+  CULTURE_AXES.forEach(function(a){
+    axisScores[a.key]=pct(sums[a.key]/counts[a.key]);
+    diffSum += Math.abs(axisScores[a.key] - (targets[a.key]==null?3:targets[a.key]));
+  });
+  var matchPercent = Math.round((1 - (diffSum/CULTURE_AXES.length)/4)*100);
+  return {axisScores:axisScores, matchPercent:Math.max(0,matchPercent)};
+}
+
+function buildRadarSVG(opts){
+  var labels=opts.labels, series=opts.series, size=opts.size||260, maxValue=opts.maxValue||5;
+  var n=labels.length, cx=size/2, cy=size/2, r=size/2-58;
+  function point(i,value){
+    var angle=(Math.PI*2*i/n)-Math.PI/2;
+    var rad=r*(Math.max(0,Math.min(maxValue,value))/maxValue);
+    return [cx+rad*Math.cos(angle), cy+rad*Math.sin(angle)];
+  }
+  var grid="";
+  for(var ring=1; ring<=4; ring++){
+    var val=maxValue*ring/4, pts=[];
+    for(var i=0;i<n;i++) pts.push(point(i,val).join(","));
+    grid += '<polygon points="'+pts.join(" ")+'" fill="none" stroke="var(--grid)" stroke-width="1"/>';
+  }
+  var axesSVG="";
+  for(i=0;i<n;i++){
+    var end=point(i,maxValue);
+    axesSVG += '<line x1="'+cx+'" y1="'+cy+'" x2="'+end[0]+'" y2="'+end[1]+'" stroke="var(--grid)" stroke-width="1"/>';
+    var angle=(Math.PI*2*i/n)-Math.PI/2;
+    var lx=cx+(r+34)*Math.cos(angle), ly=cy+(r+34)*Math.sin(angle);
+    axesSVG += '<text x="'+lx+'" y="'+ly+'" font-size="11.5" fill="var(--text-secondary)" text-anchor="middle" dominant-baseline="middle">'+esc(labels[i])+'</text>';
+  }
+  var seriesSVG="";
+  series.forEach(function(s){
+    var pts = s.values.map(function(v,i){ return point(i,v).join(","); }).join(" ");
+    seriesSVG += '<polygon points="'+pts+'" fill="'+s.color+'" fill-opacity="0.18" stroke="'+s.color+'" stroke-width="2.5"/>';
+    s.values.forEach(function(v,i){
+      var p=point(i,v);
+      seriesSVG += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="'+s.color+'"/>';
+    });
+  });
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="100%" style="max-width:'+size+'px;display:block;margin:0 auto" role="img" aria-label="radar chart">'+grid+axesSVG+seriesSVG+'</svg>';
+}
+function barChart(rows, maxValue, color){
+  return rows.map(function(row){
+    var w = maxValue>0 ? Math.max(2, Math.round(row.value/maxValue*100)) : 2;
+    return '<div class="bar-row"><span class="bar-label">'+esc(row.label)+'</span>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:'+color+'"></div></div>'+
+      '<span class="bar-value">'+esc(row.display)+'</span></div>';
+  }).join("");
+}
+
+function genToken(len){
+  len = len||14;
+  var chars="abcdefghijklmnopqrstuvwxyz0123456789", out="";
+  var bytes=new Uint8Array(len);
+  (window.crypto||window.msCrypto).getRandomValues(bytes);
+  for(var i=0;i<len;i++) out += chars[bytes[i]%chars.length];
+  return out;
+}
+
+var state = {db:null, user:null, downloads:null, canEdit:false, dataWrite:null};
+var subs = [];
+function teardownSubs(){ subs.forEach(function(u){ try{u();}catch(e){} }); subs=[]; }
+
+function getRoute(){
+  var h = location.hash.replace(/^#/, "");
+  if(h.indexOf("t-")===0) return {view:"candidate", token:h.slice(2)};
+  if(h.indexOf("r-")===0) return {view:"result-detail", token:h.slice(2)};
+  if(h==="admin") return {view:"admin", tab:"candidates"};
+  if(h.indexOf("admin-")===0) return {view:"admin", tab:h.slice(6)};
+  return {view:"home"};
+}
+
+function topbar(activeTab){
+  var nav = "";
+  if(state.canEdit){
+    var tabs=[["candidates","候補者管理"],["results","結果一覧"],["culture","カルチャー設定"]];
+    nav = '<div class="topnav">'+tabs.map(function(t){
+      var hash = t[0]==="candidates" ? "admin" : "admin-"+t[0];
+      return '<a class="tab'+(activeTab===t[0]?" is-active":"")+'" href="#'+hash+'">'+t[1]+'</a>';
+    }).join("")+'</div>';
+  }
+  return '<div class="topbar"><div class="brand"><a href="#">採用アセスメント</a></div>'+nav+'</div>';
+}
+function signinNotice(){
+  if(state.db) return "";
+  return '<div class="notice notice-warn">このツールの回答・保存には Claude へのサインインが必要です。サインイン後、このページを再読み込みしてください。</div>';
+}
+
+function renderHome(){
+  var html = topbar("");
+  html += '<div id="app-body"><div class="card stack">';
+  html += '<p class="eyebrow">Hiring Assessment</p>';
+  html += '<h1 style="font-size:22px">採用選考アセスメントツール</h1>';
+  html += '<p class="secondary-text">性格診断・適性診断・カルチャーフィット診断を、新卒／中途それぞれの選考に合わせて実施できます。</p>';
+  html += signinNotice();
+  if(state.canEdit){
+    html += '<p><a class="btn btn-primary" href="#admin">管理者ダッシュボードを開く</a></p>';
+  } else {
+    html += '<div class="notice">候補者の方は、採用担当者から送付されたリンク（<code>#t-…</code>）からアクセスしてください。</div>';
+  }
+  html += '<div class="caution">本ツールの診断結果は参考情報です。結果のみで合否を判断せず、面接など他の選考要素と組み合わせてご活用ください。性別・年齢・出身等、職務と無関係な属性による不公正な判断を避け、個人情報は適切な利用目的の範囲で安全に管理してください。</div>';
+  html += '</div></div>';
+  return html;
+}
+function renderNoAccess(){
+  return topbar("")+'<div class="card"><p>このページを見る権限がありません。管理者権限（編集者）でサインインしてください。</p></div>';
+}
+
+// ---------- Admin: candidates ----------
+var adminCandidates = [];
+var adminCandidatesLoaded = false;
+function mountAdminCandidates(){
+  if(!state.db) return;
+  var ref = state.db.collection("candidates").orderBy("createdAt","desc").limit(200);
+  var unsub = ref.onSnapshot(function(snap){
+    adminCandidates = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    adminCandidatesLoaded = true;
+    if(getRoute().view==="admin" && getRoute().tab==="candidates") paintApp();
+  }, function(){ adminCandidatesLoaded = true; paintApp(); });
+  subs.push(unsub);
+}
+function renderAdminCandidates(){
+  var html = '<div class="card stack">';
+  html += '<h2 style="font-size:17px">候補者リンクの発行</h2>';
+  html += signinNotice();
+  html += '<div class="row">'+
+    '<label class="field">氏名<input type="text" id="nc-name" placeholder="例）山田 太郎"></label>'+
+    '<label class="field" style="flex:0 0 160px">採用区分<select id="nc-track"><option value="new_grad">新卒採用</option><option value="mid_career">中途採用</option></select></label>'+
+    '<div style="align-self:flex-end"><button class="btn btn-primary" data-action="create-candidate">リンクを発行</button></div>'+
+    '</div>';
+  html += '<p class="muted" style="font-size:12.5px">発行後は、アーティファクトの共有設定を「リンクを知っている全員が編集可能」にしてから候補者へ送付してください。候補者はClaudeへのサインインが必要です。</p>';
+  html += '</div>';
+
+  html += '<div class="card">';
+  html += '<h2 style="font-size:17px">発行済みリンク一覧</h2>';
+  if(!adminCandidatesLoaded){
+    html += '<p class="muted">読み込み中…</p>';
+  } else if(adminCandidates.length===0){
+    html += '<p class="muted">まだ候補者リンクがありません。上のフォームから発行してください。</p>';
+  } else {
+    html += '<div class="table-wrap"><table><thead><tr><th>氏名</th><th>区分</th><th>状態</th><th>発行日</th><th>リンク</th></tr></thead><tbody>';
+    adminCandidates.forEach(function(c){
+      var url = location.href.split("#")[0] + "#t-" + c.id;
+      var statusPill = c.status==="completed" ? '<span class="pill pill-done">回答済み</span>' : '<span class="pill pill-wait">未回答</span>';
+      html += '<tr><td>'+esc(c.name)+'</td><td>'+esc(TRACK_LABELS[c.track]||c.track)+'</td><td>'+statusPill+'</td><td>'+fmtDate(c.createdAt)+'</td>'+
+        '<td><div class="link-box"><input type="text" readonly value="'+esc(url)+'" style="width:220px"><button class="btn btn-sm" data-action="copy-link" data-url="'+esc(url)+'">コピー</button></div></td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ---------- Admin: results ----------
+var adminResults = [];
+var adminResultsLoaded = false;
+function mountAdminResults(){
+  if(!state.db) return;
+  var ref = state.db.collection("results").orderBy("completedAt","desc").limit(200);
+  var unsub = ref.onSnapshot(function(snap){
+    adminResults = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    adminResultsLoaded = true;
+    if(getRoute().view==="admin" && getRoute().tab==="results") paintApp();
+  }, function(){ adminResultsLoaded = true; paintApp(); });
+  subs.push(unsub);
+}
+function renderAdminResults(){
+  var html = '<div class="card stack">';
+  html += '<div class="section-head"><h2 style="font-size:17px">結果一覧</h2>'+
+    '<button class="btn" data-action="export-csv"'+(adminResults.length?"":" disabled")+'>CSVダウンロード</button></div>';
+  html += signinNotice();
+  if(!adminResultsLoaded){
+    html += '<p class="muted">読み込み中…</p>';
+  } else if(adminResults.length===0){
+    html += '<p class="muted">まだ完了した回答がありません。</p>';
+  } else {
+    html += '<div class="table-wrap"><table><thead><tr><th>氏名</th><th>区分</th><th>外向性</th><th>協調性</th><th>誠実性</th><th>情緒安定</th><th>開放性</th><th>適性正答</th><th>カルチャー適合</th><th>完了日時</th><th></th></tr></thead><tbody>';
+    adminResults.forEach(function(r){
+      var p = r.personality||{};
+      html += '<tr><td>'+esc(r.name)+'</td><td>'+esc(TRACK_LABELS[r.track]||r.track)+'</td>'+
+        TRAIT_ORDER.map(function(t){ return '<td>'+(p[t]!=null?p[t]:"—")+'</td>'; }).join("")+
+        '<td>'+(r.aptitude&&r.aptitude.overall?r.aptitude.overall.correct+"/"+r.aptitude.overall.total:"—")+'</td>'+
+        '<td>'+(r.culture?r.culture.matchPercent+"%":"—")+'</td>'+
+        '<td>'+fmtDate(r.completedAt)+'</td>'+
+        '<td><a class="btn btn-sm" href="#r-'+esc(r.id)+'">詳細</a></td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  html += '<div class="caution">これらの結果は面接等の補助材料としてご活用ください。結果のみで合否を判断しないでください。個人情報は目的の範囲内で適切に管理し、不要になった際は削除してください。</div>';
+  html += '</div>';
+  return html;
+}
+function exportCsv(){
+  if(!state.downloads || adminResults.length===0) return;
+  var header = ["氏名","採用区分","外向性","協調性","誠実性","情緒安定性","開放性","論理正答","数的正答","言語正答","適性合計正答","適性回答時間(秒)","カルチャー適合度(%)","完了日時"];
+  var lines = [header.map(csvCell).join(",")];
+  adminResults.forEach(function(r){
+    var p=r.personality||{}, a=r.aptitude||{logical:{},numerical:{},verbal:{},overall:{}};
+    lines.push([
+      r.name, TRACK_LABELS[r.track]||r.track,
+      p.E,p.A,p.C,p.N,p.O,
+      (a.logical.correct||0)+"/"+(a.logical.total||0),
+      (a.numerical.correct||0)+"/"+(a.numerical.total||0),
+      (a.verbal.correct||0)+"/"+(a.verbal.total||0),
+      (a.overall.correct||0)+"/"+(a.overall.total||0),
+      r.aptitude&&r.aptitude.timeUsedSec!=null?r.aptitude.timeUsedSec:"",
+      r.culture?r.culture.matchPercent:"",
+      fmtDate(r.completedAt)
+    ].map(csvCell).join(","));
+  });
+  var csv = "﻿"+lines.join("\r\n");
+  state.downloads.save({filename:"assessment_results.csv", data:csv}).catch(function(){});
+}
+
+// ---------- Admin: culture config ----------
+var cultureConfig = {new_grad:Object.assign({},DEFAULT_TARGETS), mid_career:Object.assign({},DEFAULT_TARGETS)};
+var cultureConfigLoaded = false;
+function loadCultureConfig(){
+  if(!state.db) return;
+  state.db.doc("config/company").get().then(function(snap){
+    if(snap.exists){
+      var d = snap.data();
+      if(d.cultureTargets){
+        cultureConfig.new_grad = Object.assign({}, DEFAULT_TARGETS, d.cultureTargets.new_grad||{});
+        cultureConfig.mid_career = Object.assign({}, DEFAULT_TARGETS, d.cultureTargets.mid_career||{});
+      }
+    }
+    cultureConfigLoaded = true;
+    if(getRoute().view==="admin" && getRoute().tab==="culture") paintApp();
+  }).catch(function(){ cultureConfigLoaded = true; paintApp(); });
+}
+function renderAdminCulture(){
+  var html = '<div class="card stack">';
+  html += '<h2 style="font-size:17px">カルチャーフィットの目標プロフィール</h2>';
+  html += '<p class="secondary-text" style="font-size:13px">各軸について、自社が求める傾向を1〜5で設定してください。新卒・中途で別々に設定できます。候補者の回答との一致度（カルチャー適合度）はこの値との近さで算出されます。</p>';
+  html += signinNotice();
+  if(!cultureConfigLoaded){
+    html += '<p class="muted">読み込み中…</p>';
+  } else {
+    html += '<div class="culture-cols">';
+    ["new_grad","mid_career"].forEach(function(track){
+      html += '<div><h3 style="font-size:14px;margin-bottom:8px">'+TRACK_LABELS[track]+'</h3>';
+      CULTURE_AXES.forEach(function(a){
+        var v = cultureConfig[track][a.key];
+        html += '<div class="slider-row"><label>'+esc(a.label)+'</label>'+
+          '<input type="range" min="1" max="5" step="0.5" value="'+v+'" data-track="'+track+'" data-axis="'+a.key+'" class="culture-slider">'+
+          '<span class="sv" data-track-sv="'+track+'" data-axis-sv="'+a.key+'">'+v+'</span></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div><button class="btn btn-primary" data-action="save-culture-targets">保存</button> <span id="culture-save-status" class="muted" style="font-size:12.5px"></span></div>';
+  }
+  html += '</div>';
+  return html;
+}
+function saveCultureTargets(){
+  if(!state.db) return;
+  var newTargets = {new_grad:{}, mid_career:{}};
+  document.querySelectorAll(".culture-slider").forEach(function(input){
+    var track = input.getAttribute("data-track"), axis = input.getAttribute("data-axis");
+    newTargets[track][axis] = parseFloat(input.value);
+  });
+  cultureConfig = newTargets;
+  var statusEl = document.getElementById("culture-save-status");
+  state.db.doc("config/company").set({cultureTargets:newTargets}).then(function(){
+    if(statusEl) statusEl.textContent = "保存しました";
+  }).catch(function(){
+    if(statusEl) statusEl.textContent = "保存に失敗しました（編集者権限が必要です）";
+  });
+}
+
+// ---------- Admin: result detail ----------
+var resultDetailState = {token:null, phase:"loading", data:null};
+function ensureResultDetailLoaded(token){
+  if(resultDetailState.token===token) return;
+  resultDetailState.token = token; resultDetailState.phase="loading"; resultDetailState.data=null;
+  if(!state.db){ resultDetailState.phase="signin-required"; return; }
+  state.db.doc("results/"+token).get().then(function(snap){
+    if(resultDetailState.token!==token) return;
+    if(!snap.exists){ resultDetailState.phase="not-found"; } else { resultDetailState.phase="ready"; resultDetailState.data=snap.data(); }
+    paintApp();
+  }).catch(function(){ resultDetailState.phase="error"; paintApp(); });
+}
+function renderResultDetail(){
+  var html = topbar("")+'<div class="card">';
+  if(resultDetailState.phase==="signin-required"){ html += signinNotice(); }
+  else if(resultDetailState.phase==="loading"){ html += '<p class="muted">読み込み中…</p>'; }
+  else if(resultDetailState.phase==="not-found"){ html += '<p>結果が見つかりません。</p>'; }
+  else if(resultDetailState.phase==="error"){ html += '<p>結果の取得に失敗しました。</p>'; }
+  else {
+    var r = resultDetailState.data, p = r.personality||{}, c = r.culture||{axisScores:{},matchPercent:0}, a = r.aptitude||{};
+    html += '<div class="stack">';
+    html += '<div><p class="eyebrow">'+esc(TRACK_LABELS[r.track]||r.track)+'</p><h1 style="font-size:20px">'+esc(r.name)+'さんの結果</h1><p class="muted" style="font-size:13px">完了日時: '+fmtDate(r.completedAt)+'</p></div>';
+
+    html += '<div><h2 style="font-size:15px;margin-bottom:8px">性格診断（ビッグファイブ）</h2>';
+    html += buildRadarSVG({labels:TRAIT_ORDER.map(function(t){return TRAIT_LABELS[t];}), series:[{values:TRAIT_ORDER.map(function(t){return p[t]!=null?p[t]:3;}), color:"var(--series-1)"}]});
+    html += barChart(TRAIT_ORDER.map(function(t){ return {label:TRAIT_LABELS[t], value:p[t]!=null?p[t]:0, display:(p[t]!=null?p[t]:"—")+" / 5"}; }), 5, "var(--series-1)");
+    html += '</div>';
+
+    html += '<div><h2 style="font-size:15px;margin-bottom:8px">適性診断</h2>';
+    html += '<div class="stat-grid">'+
+      '<div class="stat-tile"><div class="num">'+(a.overall?a.overall.correct:"—")+' / '+(a.overall?a.overall.total:"—")+'</div><div class="cap">総合正答数</div></div>'+
+      '<div class="stat-tile"><div class="num">'+(a.timeUsedSec!=null?fmtSec(a.timeUsedSec):"—")+'</div><div class="cap">回答時間（制限 '+fmtSec(APTITUDE_SECONDS)+'）</div></div>'+
+      '</div>';
+    html += '<div style="margin-top:10px">'+barChart([
+      {label:"論理", value:a.logical?a.logical.correct:0, display:(a.logical?a.logical.correct+"/"+a.logical.total:"—")},
+      {label:"数的", value:a.numerical?a.numerical.correct:0, display:(a.numerical?a.numerical.correct+"/"+a.numerical.total:"—")},
+      {label:"言語", value:a.verbal?a.verbal.correct:0, display:(a.verbal?a.verbal.correct+"/"+a.verbal.total:"—")}
+    ], 4, "var(--series-1)")+'</div></div>';
+
+    html += '<div><h2 style="font-size:15px;margin-bottom:4px">カルチャーフィット診断</h2>';
+    html += '<p class="muted" style="font-size:13px;margin-bottom:8px">目標プロフィールとの適合度: <strong style="color:var(--text);font-size:15px">'+c.matchPercent+'%</strong></p>';
+    var targets = cultureConfig[r.track] || DEFAULT_TARGETS;
+    html += buildRadarSVG({labels:CULTURE_AXES.map(function(a2){return a2.label;}),
+      series:[
+        {values:CULTURE_AXES.map(function(a2){ return c.axisScores[a2.key]!=null?c.axisScores[a2.key]:3; }), color:"var(--series-1)"},
+        {values:CULTURE_AXES.map(function(a2){ return targets[a2.key]!=null?targets[a2.key]:3; }), color:"var(--series-2)"}
+      ]});
+    html += '<div class="legend"><span><span class="legend-dot" style="background:var(--series-1)"></span>候補者</span><span><span class="legend-dot" style="background:var(--series-2)"></span>自社の目標プロフィール</span></div>';
+    html += '</div>';
+
+    html += '<div class="caution">これらの結果は面接等の補助材料としてご活用ください。結果のみで合否を判断しないでください。</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ---------- Candidate flow ----------
+var cf = {token:null, phase:"loading", candidate:null, answers:{personality:{},aptitude:{},culture:{}}, step:"intro", aptRemaining:APTITUDE_SECONDS, aptTimer:null, showValidation:false};
+function resetCfTimer(){ if(cf.aptTimer){ clearInterval(cf.aptTimer); cf.aptTimer=null; } }
+function ensureCandidateLoaded(token){
+  if(cf.token===token) return;
+  resetCfTimer();
+  cf.token=token; cf.phase="loading"; cf.candidate=null; cf.step="intro";
+  cf.answers={personality:{},aptitude:{},culture:{}}; cf.aptRemaining=APTITUDE_SECONDS; cf.showValidation=false;
+  if(!state.db){ cf.phase="signin-required"; return; }
+  Promise.all([state.db.doc("candidates/"+token).get(), state.db.doc("results/"+token).get()]).then(function(res){
+    if(cf.token!==token) return;
+    var candSnap=res[0], resSnap=res[1];
+    if(!candSnap.exists){ cf.phase="invalid"; }
+    else if(resSnap.exists){ cf.phase="already-done"; cf.candidate=candSnap.data(); }
+    else { cf.candidate=candSnap.data(); cf.phase="ready"; }
+    paintApp();
+  }).catch(function(){ cf.phase="error"; paintApp(); });
+}
+function startAptitudeTimer(){
+  resetCfTimer();
+  cf.aptTimer = setInterval(function(){
+    cf.aptRemaining--;
+    if(cf.aptRemaining<=0){ cf.aptRemaining=0; resetCfTimer(); goCultureStep(); return; }
+    var t = document.getElementById("apt-timer");
+    if(t){ t.textContent = fmtSec(cf.aptRemaining); t.className = "timer"+(cf.aptRemaining<60?" is-low":""); }
+  }, 1000);
+}
+function goCultureStep(){ cf.step="culture"; paintApp(); }
+function submitAssessment(){
+  if(!state.db || !cf.candidate) return;
+  resetCfTimer();
+  var personality = scoreBigFive(cf.answers.personality);
+  var aptitude = scoreAptitude(cf.answers.aptitude, cf.candidate.track);
+  aptitude.timeUsedSec = APTITUDE_SECONDS - cf.aptRemaining;
+  var targets = cultureConfig[cf.candidate.track] || DEFAULT_TARGETS;
+  var culture = scoreCulture(cf.answers.culture, targets);
+  var payload = {
+    name: cf.candidate.name, track: cf.candidate.track,
+    startedAt: cf.candidate.createdAt||Date.now(), completedAt: Date.now(),
+    personality: personality, aptitude: aptitude, culture: culture
+  };
+  cf.step="submitting"; paintApp();
+  Promise.all([
+    state.db.doc("results/"+cf.token).set(payload),
+    state.db.doc("candidates/"+cf.token).update({status:"completed", completedAt:Date.now()})
+  ]).then(function(){ cf.step="done"; paintApp(); })
+    .catch(function(){ cf.step="submit-error"; paintApp(); });
+}
+function renderCandidate(){
+  var html = '<div class="topbar"><div class="brand"><a href="#">採用アセスメント</a></div></div><div id="app-body">';
+  if(cf.phase==="signin-required"){ html += '<div class="card">'+signinNotice()+'</div>'; }
+  else if(cf.phase==="loading"){ html += '<div class="card"><p class="muted">読み込み中…</p></div>'; }
+  else if(cf.phase==="invalid"){ html += '<div class="card"><p>このリンクは無効です。発行元の採用担当者にお問い合わせください。</p></div>'; }
+  else if(cf.phase==="already-done"){ html += '<div class="card"><p>この回答はすでに提出されています。ご協力ありがとうございました。</p></div>'; }
+  else if(cf.phase==="error"){ html += '<div class="card"><p>読み込みに失敗しました。再読み込みしてください。</p></div>'; }
+  else {
+    var steps=["intro","personality","aptitude","culture","done"];
+    var idx = steps.indexOf(cf.step)>=0?steps.indexOf(cf.step):0;
+    if(cf.step!=="intro" && cf.step!=="done" && cf.step!=="submitting" && cf.step!=="submit-error"){
+      html += '<div class="card" style="margin-top:12px"><div class="progressbar"><span style="width:'+Math.round(idx/4*100)+'%"></span></div></div>';
+    }
+    if(cf.step==="intro") html += renderCfIntro();
+    else if(cf.step==="personality") html += renderCfPersonality();
+    else if(cf.step==="aptitude") html += renderCfAptitude();
+    else if(cf.step==="culture") html += renderCfCulture();
+    else if(cf.step==="submitting") html += '<div class="card"><p class="muted">送信中…</p></div>';
+    else if(cf.step==="submit-error") html += '<div class="card"><p>送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。</p><button class="btn btn-primary" data-action="retry-submit">再送信</button></div>';
+    else if(cf.step==="done") html += '<div class="card"><h2 style="font-size:17px">ご回答ありがとうございました</h2><p class="secondary-text" style="margin-top:8px">回答内容は採用担当者に送付されます。選考結果については別途ご連絡いたします。</p></div>';
+  }
+  html += '</div>';
+  return html;
+}
+function renderCfIntro(){
+  var c = cf.candidate;
+  var html = '<div class="card stack">';
+  html += '<p class="eyebrow">'+esc(TRACK_LABELS[c.track]||c.track)+'</p>';
+  html += '<h1 style="font-size:20px">'+esc(c.name)+' 様</h1>';
+  html += '<p class="secondary-text">これから性格診断・適性診断・カルチャーフィット診断の3つを行います。全体で20分ほどかかります。適性診断には時間制限があります。回答中はこのページを閉じないようにお願いします。</p>';
+  html += '<div class="caution">回答内容は選考の補助情報として利用され、この結果のみで合否が決まるものではありません。個人情報は適切に管理されます。</div>';
+  html += '<div><button class="btn btn-primary" data-action="start-test">はじめる</button></div>';
+  html += '</div>';
+  return html;
+}
+function renderCfPersonality(){
+  var answered = Object.keys(cf.answers.personality).length;
+  var html = '<div class="card">';
+  html += '<h2 style="font-size:16px;margin-bottom:4px">性格診断</h2><p class="muted" style="font-size:13px;margin-bottom:8px">各項目について、最も当てはまる度合いを選んでください。（'+answered+' / '+BIG_FIVE_ITEMS.length+'）</p>';
+  BIG_FIVE_ITEMS.forEach(function(item,i){
+    var sel = cf.answers.personality[i];
+    var opts="";
+    for(var v=1;v<=5;v++){
+      opts += '<label class="likert-opt"><input type="radio" name="p-'+i+'" data-section="personality" data-index="'+i+'" value="'+v+'" '+(sel===v?"checked":"")+'><span>'+v+'</span></label>';
+    }
+    html += '<div class="likert-item"><p class="likert-text">'+esc(item.text)+'</p><div class="likert-scale"><span class="likert-end">そう思わない</span><div class="likert-opts">'+opts+'</div><span class="likert-end">そう思う</span></div></div>';
+  });
+  if(cf.showValidation && answered<BIG_FIVE_ITEMS.length){
+    html += '<p style="color:var(--critical);font-size:13px;margin-top:10px">すべての項目に回答してください（未回答 '+(BIG_FIVE_ITEMS.length-answered)+' 件）。</p>';
+  }
+  html += '<div style="margin-top:14px"><button class="btn btn-primary" data-action="next-to-aptitude">次へ（適性診断）</button></div>';
+  html += '</div>';
+  return html;
+}
+function renderCfAptitude(){
+  var set = APTITUDE_SETS[cf.candidate.track] || APTITUDE_SETS.new_grad;
+  var cats=[["logical","論理"],["numerical","数的"],["verbal","言語"]];
+  var html = '<div class="card">';
+  html += '<div class="section-head"><h2 style="font-size:16px">適性診断</h2><span id="apt-timer" class="timer'+(cf.aptRemaining<60?" is-low":"")+'">'+fmtSec(cf.aptRemaining)+'</span></div>';
+  html += '<p class="muted" style="font-size:13px;margin-bottom:8px">時間内にできるだけ多く回答してください。時間が0になると自動的に次へ進みます。</p>';
+  var qNum=0;
+  cats.forEach(function(catDef){
+    var cat=catDef[0], label=catDef[1];
+    html += '<h3 style="font-size:13px;color:var(--text-muted);margin:14px 0 4px">'+label+'</h3>';
+    set[cat].forEach(function(item,i){
+      qNum++;
+      var sel = cf.answers.aptitude[cat+"-"+i];
+      var opts = item.options.map(function(optText,oi){
+        return '<label class="mc-opt'+(sel===oi?" is-selected":"")+'"><input type="radio" name="'+cat+"-"+i+'" data-section="aptitude" data-cat="'+cat+'" data-index="'+i+'" value="'+oi+'" '+(sel===oi?"checked":"")+'><span class="mc-letter">'+["A","B","C","D"][oi]+'</span><span>'+esc(optText)+'</span></label>';
+      }).join("");
+      html += '<div class="mc-item"><p class="mc-q"><span class="mc-index">Q'+qNum+'</span>'+esc(item.q)+'</p><div class="mc-opts">'+opts+'</div></div>';
+    });
+  });
+  html += '<div style="margin-top:14px"><button class="btn btn-primary" data-action="next-to-culture">次へ（カルチャーフィット診断）</button></div>';
+  html += '</div>';
+  return html;
+}
+function renderCfCulture(){
+  var answered = Object.keys(cf.answers.culture).length;
+  var html = '<div class="card">';
+  html += '<h2 style="font-size:16px;margin-bottom:4px">カルチャーフィット診断</h2><p class="muted" style="font-size:13px;margin-bottom:8px">働き方の好みについて、最も当てはまる度合いを選んでください。（'+answered+' / '+CULTURE_ITEMS.length+'）</p>';
+  CULTURE_ITEMS.forEach(function(item,i){
+    var sel = cf.answers.culture[i];
+    var opts="";
+    for(var v=1;v<=5;v++){
+      opts += '<label class="likert-opt"><input type="radio" name="c-'+i+'" data-section="culture" data-index="'+i+'" value="'+v+'" '+(sel===v?"checked":"")+'><span>'+v+'</span></label>';
+    }
+    html += '<div class="likert-item"><p class="likert-text">'+esc(item.text)+'</p><div class="likert-scale"><span class="likert-end">そう思わない</span><div class="likert-opts">'+opts+'</div><span class="likert-end">そう思う</span></div></div>';
+  });
+  if(cf.showValidation && answered<CULTURE_ITEMS.length){
+    html += '<p style="color:var(--critical);font-size:13px;margin-top:10px">すべての項目に回答してください（未回答 '+(CULTURE_ITEMS.length-answered)+' 件）。</p>';
+  }
+  html += '<div style="margin-top:14px"><button class="btn btn-primary" data-action="submit-test">回答を送信する</button></div>';
+  html += '</div>';
+  return html;
+}
+
+// ---------- dispatch ----------
+function paintApp(){
+  var route = getRoute();
+  var app = document.getElementById("app");
+  if(route.view==="home"){ app.innerHTML = renderHome(); }
+  else if(route.view==="admin"){
+    if(!state.canEdit){ app.innerHTML = renderNoAccess(); return; }
+    var body = route.tab==="results" ? renderAdminResults() : route.tab==="culture" ? renderAdminCulture() : renderAdminCandidates();
+    app.innerHTML = topbar(route.tab==="results"||route.tab==="culture"?route.tab:"candidates") + '<div id="app-body">' + body + '</div>';
+  }
+  else if(route.view==="result-detail"){
+    if(!state.canEdit){ app.innerHTML = renderNoAccess(); return; }
+    ensureResultDetailLoaded(route.token);
+    app.innerHTML = renderResultDetail();
+  }
+  else if(route.view==="candidate"){
+    ensureCandidateLoaded(route.token);
+    app.innerHTML = renderCandidate();
+  }
+}
+function render(){
+  teardownSubs();
+  var route = getRoute();
+  if(route.view==="admin"){
+    if(route.tab==="results") mountAdminResults();
+    else if(route.tab==="culture") loadCultureConfig();
+    else mountAdminCandidates();
+  }
+  paintApp();
+}
+
+document.addEventListener("change", function(e){
+  var t = e.target;
+  if(t.matches && t.matches('input[type=radio][data-section]')){
+    var section = t.getAttribute("data-section");
+    if(section==="aptitude"){
+      var key = t.getAttribute("data-cat")+"-"+t.getAttribute("data-index");
+      cf.answers.aptitude[key] = Number(t.value);
+      var item = t.closest(".mc-item");
+      if(item){ item.querySelectorAll(".mc-opt").forEach(function(o){ o.classList.remove("is-selected"); }); t.closest(".mc-opt").classList.add("is-selected"); }
+    } else {
+      cf.answers[section][Number(t.getAttribute("data-index"))] = Number(t.value);
+    }
+  }
+  if(t.classList && t.classList.contains("culture-slider")){
+    var track = t.getAttribute("data-track"), axis = t.getAttribute("data-axis");
+    var sv = document.querySelector('[data-track-sv="'+track+'"][data-axis-sv="'+axis+'"]');
+    if(sv) sv.textContent = t.value;
+  }
+});
+
+document.addEventListener("click", function(e){
+  var btn = e.target.closest && e.target.closest("[data-action]");
+  if(!btn) return;
+  var action = btn.getAttribute("data-action");
+  if(action==="start-test"){ cf.step="personality"; paintApp(); }
+  else if(action==="next-to-aptitude"){
+    if(Object.keys(cf.answers.personality).length < BIG_FIVE_ITEMS.length){ cf.showValidation=true; paintApp(); return; }
+    cf.showValidation=false; cf.step="aptitude"; paintApp(); startAptitudeTimer();
+  }
+  else if(action==="next-to-culture"){ goCultureStep(); }
+  else if(action==="submit-test"){
+    if(Object.keys(cf.answers.culture).length < CULTURE_ITEMS.length){ cf.showValidation=true; paintApp(); return; }
+    submitAssessment();
+  }
+  else if(action==="retry-submit"){ submitAssessment(); }
+  else if(action==="create-candidate"){
+    var nameInput = document.getElementById("nc-name"), trackSelect = document.getElementById("nc-track");
+    var name = nameInput.value.trim();
+    if(!name || !state.db) return;
+    var token = genToken();
+    btn.disabled = true;
+    state.db.doc("candidates/"+token).set({name:name, track:trackSelect.value, createdAt:Date.now(), status:"not_started"})
+      .then(function(){ nameInput.value=""; btn.disabled=false; })
+      .catch(function(){ btn.disabled=false; alert_inline("リンクの発行に失敗しました。編集者権限でサインインしているかご確認ください。"); });
+  }
+  else if(action==="copy-link"){
+    var url = btn.getAttribute("data-url");
+    copyText(url, btn);
+  }
+  else if(action==="export-csv"){ exportCsv(); }
+  else if(action==="save-culture-targets"){ saveCultureTargets(); }
+});
+
+function alert_inline(msg){
+  var app = document.getElementById("app-body") || document.getElementById("app");
+  var box = document.createElement("div");
+  box.className = "notice notice-critical";
+  box.style.marginTop = "12px";
+  box.textContent = msg;
+  app.insertBefore(box, app.firstChild);
+  setTimeout(function(){ box.remove(); }, 4000);
+}
+function copyText(text, btnEl){
+  var original = btnEl.textContent;
+  function flash(msg){ btnEl.textContent = msg; setTimeout(function(){ btnEl.textContent = original; }, 1500); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ flash("コピーしました"); }).catch(function(){ fallbackCopy(text, flash); });
+  } else { fallbackCopy(text, flash); }
+}
+function fallbackCopy(text, flash){
+  var ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); flash("コピーしました"); } catch(e){ flash("コピーできませんでした"); }
+  document.body.removeChild(ta);
+}
+
+window.addEventListener("hashchange", render);
+
+(async function boot(){
+  try{
+    state.db = (await claude.use("db")) || null;
+  }catch(e){ state.db = null; }
+  try{
+    state.user = (await claude.use("user")) || null;
+    state.canEdit = state.user ? await state.user.canEdit() : false;
+  }catch(e){ state.canEdit = false; }
+  try{
+    state.downloads = (await claude.use("downloads")) || null;
+  }catch(e){ state.downloads = null; }
+  render();
+})();
+})();
+</script>
